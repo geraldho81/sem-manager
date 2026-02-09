@@ -18,6 +18,7 @@ export function SetupStep({ onStart, error }: SetupStepProps) {
   const [markets, setMarkets] = useState<Markets>({});
   const [loading, setLoading] = useState(false);
   const [browsing, setBrowsing] = useState(false);
+  const isCloud = !!process.env.NEXT_PUBLIC_BACKEND_URL;
 
   useEffect(() => {
     api.getMarkets().then((data) => setMarkets(data.markets)).catch(() => {});
@@ -43,7 +44,8 @@ export function SetupStep({ onStart, error }: SetupStepProps) {
     e.preventDefault();
 
     const validUrls = urls.filter((u) => u.trim());
-    if (!projectName.trim() || validUrls.length === 0 || !projectFolder.trim()) return;
+    if (!projectName.trim() || validUrls.length === 0) return;
+    if (!isCloud && !projectFolder.trim()) return;
 
     setLoading(true);
     await onStart(projectName.trim(), {
@@ -71,42 +73,44 @@ export function SetupStep({ onStart, error }: SetupStepProps) {
         />
       </div>
 
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
-          Output Folder
-        </label>
-        <div className="flex gap-2">
-          <input
-            type="text"
-            value={projectFolder}
-            onChange={(e) => setProjectFolder(e.target.value)}
-            placeholder="/Users/you/Desktop/sem-output"
-            className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            required
-          />
-          <button
-            type="button"
-            disabled={browsing}
-            onClick={async () => {
-              setBrowsing(true);
-              try {
-                const { folder } = await api.browseFolder();
-                setProjectFolder(folder);
-              } catch {
-                // User cancelled or timed out
-              } finally {
-                setBrowsing(false);
-              }
-            }}
-            className="px-4 py-2 bg-gray-100 text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-200 whitespace-nowrap disabled:opacity-50"
-          >
-            {browsing ? 'Selecting...' : 'Browse...'}
-          </button>
+      {!isCloud && (
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Output Folder
+          </label>
+          <div className="flex gap-2">
+            <input
+              type="text"
+              value={projectFolder}
+              onChange={(e) => setProjectFolder(e.target.value)}
+              placeholder="/Users/you/Desktop/sem-output"
+              className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              required
+            />
+            <button
+              type="button"
+              disabled={browsing}
+              onClick={async () => {
+                setBrowsing(true);
+                try {
+                  const { folder } = await api.browseFolder();
+                  setProjectFolder(folder);
+                } catch {
+                  // User cancelled or timed out
+                } finally {
+                  setBrowsing(false);
+                }
+              }}
+              className="px-4 py-2 bg-gray-100 text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-200 whitespace-nowrap disabled:opacity-50"
+            >
+              {browsing ? 'Selecting...' : 'Browse...'}
+            </button>
+          </div>
+          <p className="mt-1 text-sm text-gray-500">
+            Where to save all agent outputs (research, ads, Excel)
+          </p>
         </div>
-        <p className="mt-1 text-sm text-gray-500">
-          Where to save all agent outputs (research, ads, Excel)
-        </p>
-      </div>
+      )}
 
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">Target Market</label>
@@ -208,7 +212,7 @@ export function SetupStep({ onStart, error }: SetupStepProps) {
 
       <button
         type="submit"
-        disabled={loading || !projectName.trim() || !urls[0]?.trim() || !projectFolder.trim()}
+        disabled={loading || !projectName.trim() || !urls[0]?.trim() || (!isCloud && !projectFolder.trim())}
         className="w-full py-3 px-4 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
       >
         {loading ? 'Starting...' : 'Start Analysis'}

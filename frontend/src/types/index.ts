@@ -15,7 +15,7 @@ export interface ProjectConfig {
   landing_page_urls: string[];
   market: string;
   competitor_urls: string[];
-  project_folder: string;
+  project_folder?: string;
 }
 
 export interface Project {

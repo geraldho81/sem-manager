@@ -99,6 +99,7 @@ class Settings(BaseSettings):
 
     # Application Settings
     CORS_ORIGINS: List[str] = ["http://localhost:3000", "http://localhost:5173"]
+    FRONTEND_URL: str = ""  # Set to Render frontend URL in production
     MAX_RETRIES: int = 3
     RETRY_DELAY: float = 1.0
     SCRAPING_TIMEOUT: int = 30

@@ -21,7 +21,7 @@ class ProjectConfig(BaseModel):
     landing_page_urls: List[str] = Field(min_length=1)
     market: str  # Market key from MARKETS dict (e.g., "sg", "us")
     competitor_urls: List[str] = Field(default_factory=list)
-    project_folder: str  # User-chosen output folder
+    project_folder: str = ""  # User-chosen output folder (optional on cloud)
 
 
 class ProjectResponse(BaseModel):

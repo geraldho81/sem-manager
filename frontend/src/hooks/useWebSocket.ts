@@ -11,8 +11,16 @@ export function useWebSocket(projectId: string | null) {
   const connect = useCallback(() => {
     if (!projectId) return;
 
-    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-    const ws = new WebSocket(`${protocol}//localhost:8000/ws/${projectId}`);
+    const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || '';
+    let wsUrl: string;
+    if (backendUrl) {
+      const wsBase = backendUrl.replace(/^http/, 'ws');
+      wsUrl = `${wsBase}/ws/${projectId}`;
+    } else {
+      const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+      wsUrl = `${protocol}//${window.location.host}/ws/${projectId}`;
+    }
+    const ws = new WebSocket(wsUrl);
 
     ws.onopen = () => setConnected(true);
 

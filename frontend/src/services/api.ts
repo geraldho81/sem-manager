@@ -1,6 +1,7 @@
 import { Project, ProjectConfig, PipelineStatus, Markets } from '@/types';
 
-const BASE = '/api';
+const BACKEND = process.env.NEXT_PUBLIC_BACKEND_URL || '';
+const BASE = `${BACKEND}/api`;
 
 async function request<T>(path: string, options?: RequestInit): Promise<T> {
   const res = await fetch(`${BASE}${path}`, {

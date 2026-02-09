@@ -37,7 +37,10 @@ async def browse_folder() -> Dict[str, str]:
     """Open a native OS folder picker and return the selected path."""
     import asyncio
     import subprocess
-    import functools
+    import sys
+
+    if sys.platform != "darwin":
+        raise HTTPException(status_code=501, detail="Folder picker is only available on macOS")
 
     def _pick_folder():
         result = subprocess.run(
