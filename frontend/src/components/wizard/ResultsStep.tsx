@@ -53,30 +53,47 @@ export function ResultsStep({ results, projectId, onRestart }: ResultsStepProps)
         ))}
       </div>
 
-      {/* Tab content */}
-      <div id="research-tab-content" className={tab === 'research' ? '' : 'hidden'}>
-        <ResearchSummary synthesis={synthesis} />
-      </div>
-      <div id="personas-tab-content" className={tab === 'personas' ? '' : 'hidden'}>
-        <PersonaCards personas={personas} />
-      </div>
-      <div id="keywords-tab-content" className={tab === 'keywords' ? '' : 'hidden'}>
-        <KeywordDashboard keywords={keywords} currency={currency} />
-      </div>
-      <div id="strategy-tab-content" className={tab === 'strategy' ? '' : 'hidden'}>
-        <StrategyView strategy={strategy} currency={currency} />
-      </div>
-      <div id="rsas-tab-content" className={tab === 'rsas' ? '' : 'hidden'}>
-        <RSAPreview adGroups={rsas} />
-      </div>
+      {/* Tab content - conditionally render only active tab */}
+      {tab === 'research' && (
+        <div id="research-tab-content">
+          <ResearchSummary synthesis={synthesis} />
+        </div>
+      )}
+      {tab === 'personas' && (
+        <div id="personas-tab-content">
+          <PersonaCards personas={personas} />
+        </div>
+      )}
+      {tab === 'keywords' && (
+        <div id="keywords-tab-content">
+          <KeywordDashboard keywords={keywords} currency={currency} />
+        </div>
+      )}
+      {tab === 'strategy' && (
+        <div id="strategy-tab-content">
+          <StrategyView strategy={strategy} currency={currency} />
+        </div>
+      )}
+      {tab === 'rsas' && (
+        <div id="rsas-tab-content">
+          <RSAPreview adGroups={rsas} />
+        </div>
+      )}
       {tab === 'export' && (
-        <ExportTab projectId={projectId} onRestart={onRestart} />
+        <ExportTab projectId={projectId} onRestart={onRestart} results={results} currency={currency} />
       )}
     </div>
   );
 }
 
-function ExportTab({ projectId, onRestart }: { projectId: string; onRestart: () => void }) {
+interface ExportTabProps {
+  projectId: string;
+  onRestart: () => void;
+  results: Record<string, any>;
+  currency: string;
+}
+
+function ExportTab({ projectId, onRestart, results, currency }: ExportTabProps) {
   const zipUrl = api.getExportZipUrl(projectId);
   const [pdfLoading, setPdfLoading] = useState(false);
 
@@ -85,10 +102,12 @@ function ExportTab({ projectId, onRestart }: { projectId: string; onRestart: () 
     try {
       await exportResultsToPDF({
         filename: `sem-analysis-${projectId}.pdf`,
+        results,
+        currency,
       });
     } catch (error) {
-      alert('Failed to generate PDF. Please try again.');
       console.error('PDF export error:', error);
+      alert('Failed to generate PDF. Error: ' + (error instanceof Error ? error.message : 'Unknown error'));
     } finally {
       setPdfLoading(false);
     }
