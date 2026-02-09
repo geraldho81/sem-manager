@@ -54,6 +54,5 @@ export const api = {
 
   // Exports
   getExportExcelUrl: (projectId: string) => `${BASE}/exports/${projectId}/excel`,
-  getResearch: (projectId: string) => request<Record<string, any>>(`/exports/${projectId}/research`),
-  getStrategy: (projectId: string) => request<Record<string, any>>(`/exports/${projectId}/strategy`),
+  getExportZipUrl: (projectId: string) => `${BASE}/exports/${projectId}/zip`,
 };

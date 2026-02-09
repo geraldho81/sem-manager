@@ -1,10 +1,10 @@
 from fastapi import APIRouter, HTTPException
-from fastapi.responses import FileResponse, JSONResponse
+from fastapi.responses import FileResponse, StreamingResponse
 from pathlib import Path
-import json
+import io
+import zipfile
 
 from app.api.routes.projects import projects_db
-from app.api.routes.pipeline import pipeline_status_db
 
 router = APIRouter()
 
@@ -39,40 +39,36 @@ async def export_excel(project_id: str) -> FileResponse:
     )
 
 
-@router.get("/{project_id}/research")
-async def export_research(project_id: str) -> JSONResponse:
-    """Download full research JSON."""
+@router.get("/{project_id}/zip")
+async def export_zip(project_id: str):
+    """Download all outputs as a single zip: .md files + .xlsx media plan."""
     project_path = _get_project_folder(project_id)
-    research_path = project_path / "research"
 
-    if not research_path.exists():
-        raise HTTPException(status_code=404, detail="Research not found")
+    project_name = projects_db[project_id].get("name", "sem_export")
+    safe_name = "".join(c if c.isalnum() or c in ("-", "_") else "_" for c in project_name)
 
-    research = {}
-    for file in research_path.glob("*.json"):
-        with open(file, "r", encoding="utf-8") as f:
-            research[file.stem] = json.load(f)
+    buf = io.BytesIO()
+    with zipfile.ZipFile(buf, "w", zipfile.ZIP_DEFLATED) as zf:
+        # Add .md files from research/ and ads/ subfolders
+        for subfolder in ("research", "ads"):
+            folder = project_path / subfolder
+            if folder.exists():
+                for md_file in sorted(folder.glob("*.md")):
+                    zf.write(md_file, f"{subfolder}/{md_file.name}")
 
-    if not research:
-        raise HTTPException(status_code=404, detail="No research files found")
+        # Add .xlsx media plan
+        xlsx_files = list(project_path.glob("media_plan_*.xlsx"))
+        if xlsx_files:
+            xlsx_file = max(xlsx_files, key=lambda f: f.stat().st_mtime)
+            zf.write(xlsx_file, xlsx_file.name)
 
-    return JSONResponse(content=research)
+    buf.seek(0)
 
+    if buf.getbuffer().nbytes <= 22:  # Empty zip is ~22 bytes
+        raise HTTPException(status_code=404, detail="No output files found. Run the pipeline first.")
 
-@router.get("/{project_id}/strategy")
-async def export_strategy(project_id: str) -> JSONResponse:
-    """Download strategy JSON."""
-    if project_id not in pipeline_status_db:
-        raise HTTPException(status_code=404, detail="Pipeline not found")
-
-    outputs = pipeline_status_db[project_id].outputs
-    strategy = outputs.get("strategy")
-    rsas = outputs.get("rsas")
-
-    if not strategy:
-        raise HTTPException(status_code=404, detail="Strategy not found")
-
-    return JSONResponse(content={
-        "strategy": strategy,
-        "rsas": rsas,
-    })
+    return StreamingResponse(
+        buf,
+        media_type="application/zip",
+        headers={"Content-Disposition": f'attachment; filename="{safe_name}_export.zip"'},
+    )
