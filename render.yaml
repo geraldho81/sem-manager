@@ -1,0 +1,44 @@
+services:
+  # Backend service
+  - type: web
+    name: sem-manager-backend
+    runtime: python
+    plan: free
+    region: singapore
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT --ws wsproto
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.0
+      - key: KIMI_API_KEY
+        sync: false
+      - key: KIMI_API_BASE
+        value: https://api.moonshot.ai/v1
+      - key: KIMI_MODEL_STANDARD
+        value: kimi-k2-turbo-preview
+      - key: KIMI_MODEL_THINKING
+        value: kimi-k2.5
+      - key: DATAFORSEO_LOGIN
+        sync: false
+      - key: DATAFORSEO_PASSWORD
+        sync: false
+    healthCheckPath: /health
+
+  # Frontend service
+  - type: web
+    name: sem-manager-frontend
+    runtime: node
+    plan: free
+    region: singapore
+    rootDir: frontend
+    buildCommand: npm ci && npm run build
+    startCommand: npm start
+    envVars:
+      - key: NODE_VERSION
+        value: 20.11.0
+      - key: NEXT_PUBLIC_BACKEND_URL
+        fromService:
+          name: sem-manager-backend
+          type: web
+          property: url
