@@ -6,11 +6,13 @@ import { PersonaCards } from '@/components/results/PersonaCards';
 import { KeywordDashboard } from '@/components/results/KeywordDashboard';
 import { StrategyView } from '@/components/results/StrategyView';
 import { RSAPreview } from '@/components/results/RSAPreview';
+import { CompetitorView } from '@/components/results/CompetitorView';
 import { api } from '@/services/api';
 
 const TABS = [
   { key: 'research', label: 'Research Summary' },
   { key: 'personas', label: 'Personas' },
+  { key: 'competitors', label: 'Competitors' },
   { key: 'keywords', label: 'Keywords' },
   { key: 'strategy', label: 'Strategy' },
   { key: 'rsas', label: 'RSAs' },
@@ -28,6 +30,7 @@ export function ResultsStep({ results, projectId, onRestart }: ResultsStepProps)
 
   const synthesis = results?.synthesis || {};
   const personas = results?.persona_research?.personas || [];
+  const competitorResearch = results?.competitor_research || {};
   const keywords = results?.keyword_research || {};
   const strategy = results?.strategy || {};
   const rsas = results?.rsas?.ad_group_rsas || [];
@@ -61,6 +64,11 @@ export function ResultsStep({ results, projectId, onRestart }: ResultsStepProps)
       {tab === 'personas' && (
         <div id="personas-tab-content">
           <PersonaCards personas={personas} />
+        </div>
+      )}
+      {tab === 'competitors' && (
+        <div id="competitors-tab-content">
+          <CompetitorView competitorResearch={competitorResearch} />
         </div>
       )}
       {tab === 'keywords' && (
