@@ -1,11 +1,12 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { api } from '@/services/api';
-import { Markets, ProjectConfig } from '@/types';
+import { ProjectConfig } from '@/types';
 
-// Default markets in case API fails
-const DEFAULT_MARKETS: Markets = {
+// Hardcoded markets - verified against DataForSEO API documentation
+// location_code values are official DataForSEO country codes
+const MARKETS = {
   us: { name: 'United States', location_code: 2840, currency: 'USD', currency_symbol: '$', language: 'en', flag: '🇺🇸' },
   uk: { name: 'United Kingdom', location_code: 2826, currency: 'GBP', currency_symbol: '£', language: 'en', flag: '🇬🇧' },
   sg: { name: 'Singapore', location_code: 2702, currency: 'SGD', currency_symbol: 'S$', language: 'en', flag: '🇸🇬' },
@@ -16,7 +17,9 @@ const DEFAULT_MARKETS: Markets = {
   ph: { name: 'Philippines', location_code: 2608, currency: 'PHP', currency_symbol: '₱', language: 'en', flag: '🇵🇭' },
   th: { name: 'Thailand', location_code: 2764, currency: 'THB', currency_symbol: '฿', language: 'th', flag: '🇹🇭' },
   hk: { name: 'Hong Kong', location_code: 2344, currency: 'HKD', currency_symbol: 'HK$', language: 'zh', flag: '🇭🇰' },
-};
+} as const;
+
+type MarketKey = keyof typeof MARKETS;
 
 interface SetupStepProps {
   onStart: (name: string, config: ProjectConfig) => void;
@@ -25,39 +28,13 @@ interface SetupStepProps {
 
 export function SetupStep({ onStart, error }: SetupStepProps) {
   const [projectName, setProjectName] = useState('');
-  const [market, setMarket] = useState('us');
+  const [market, setMarket] = useState<MarketKey>('us');
   const [urls, setUrls] = useState(['']);
   const [competitorUrls, setCompetitorUrls] = useState(['']);
   const [projectFolder, setProjectFolder] = useState('');
-  const [markets, setMarkets] = useState<Markets>(DEFAULT_MARKETS);
-  const [marketsLoading, setMarketsLoading] = useState(true);
-  const [marketsError, setMarketsError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [browsing, setBrowsing] = useState(false);
   const isCloud = !!process.env.NEXT_PUBLIC_BACKEND_URL;
-
-  const loadMarkets = async () => {
-    setMarketsLoading(true);
-    setMarketsError(null);
-    try {
-      const data = await api.getMarkets();
-      if (data.markets && Object.keys(data.markets).length > 0) {
-        setMarkets(data.markets);
-      } else {
-        console.warn('API returned empty markets, using defaults');
-      }
-    } catch (err) {
-      console.error('Failed to load markets:', err);
-      setMarketsError('Failed to load markets. Using default options.');
-      // Keep default markets
-    } finally {
-      setMarketsLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    loadMarkets();
-  }, []);
 
   const addUrl = () => setUrls([...urls, '']);
   const removeUrl = (i: number) => setUrls(urls.filter((_, idx) => idx !== i));
@@ -92,7 +69,7 @@ export function SetupStep({ onStart, error }: SetupStepProps) {
     setLoading(false);
   };
 
-  const selectedMarket = markets[market];
+  const selectedMarket = MARKETS[market];
 
   return (
     <form onSubmit={handleSubmit} className="max-w-2xl mx-auto space-y-6">
@@ -149,48 +126,20 @@ export function SetupStep({ onStart, error }: SetupStepProps) {
 
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">Target Market</label>
-        <div className="relative">
-          <select
-            value={market}
-            onChange={(e) => setMarket(e.target.value)}
-            disabled={marketsLoading}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {Object.entries(markets).map(([key, m]) => (
-              <option key={key} value={key}>
-                {m.flag} {m.name} ({m.currency})
-              </option>
-            ))}
-          </select>
-          {marketsLoading && (
-            <div className="absolute right-8 top-1/2 -translate-y-1/2">
-              <svg className="animate-spin h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth={4} />
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-              </svg>
-            </div>
-          )}
-        </div>
-        {marketsError && (
-          <div className="mt-1 flex items-center gap-2 text-xs text-amber-600">
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-            </svg>
-            <span>{marketsError}</span>
-            <button
-              type="button"
-              onClick={loadMarkets}
-              className="text-blue-600 hover:underline"
-            >
-              Retry
-            </button>
-          </div>
-        )}
-        {selectedMarket && !marketsError && (
-          <p className="mt-1 text-sm text-gray-500">
-            CPC data in {selectedMarket.currency} ({selectedMarket.currency_symbol})
-          </p>
-        )}
+        <select
+          value={market}
+          onChange={(e) => setMarket(e.target.value as MarketKey)}
+          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+        >
+          {(Object.entries(MARKETS) as [MarketKey, typeof MARKETS[MarketKey]][]).map(([key, m]) => (
+            <option key={key} value={key}>
+              {m.flag} {m.name} ({m.currency})
+            </option>
+          ))}
+        </select>
+        <p className="mt-1 text-sm text-gray-500">
+          CPC data in {selectedMarket.currency} ({selectedMarket.currency_symbol})
+        </p>
       </div>
 
       <div>

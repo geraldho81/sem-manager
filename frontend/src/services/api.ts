@@ -1,4 +1,4 @@
-import { Project, ProjectConfig, PipelineStatus, Markets } from '@/types';
+import { Project, ProjectConfig, PipelineStatus } from '@/types';
 
 const BACKEND = process.env.NEXT_PUBLIC_BACKEND_URL || '';
 const BASE = `${BACKEND}/api`;
@@ -16,9 +16,6 @@ async function request<T>(path: string, options?: RequestInit): Promise<T> {
 }
 
 export const api = {
-  // Markets
-  getMarkets: () => request<{ markets: Markets }>('/projects/markets/list'),
-
   // Folder picker
   browseFolder: () => request<{ folder: string }>('/projects/browse-folder'),
 
