@@ -96,10 +96,18 @@ interface ExportTabProps {
 function ExportTab({ projectId, onRestart, results, currency }: ExportTabProps) {
   const zipUrl = api.getExportZipUrl(projectId);
   const [pdfLoading, setPdfLoading] = useState(false);
+  const [pdfError, setPdfError] = useState<string | null>(null);
 
   const handleExportPDF = async () => {
     setPdfLoading(true);
+    setPdfError(null);
+    
     try {
+      // Validate results before attempting export
+      if (!results || Object.keys(results).length === 0) {
+        throw new Error('No results data available. Please complete the analysis first.');
+      }
+      
       await exportResultsToPDF({
         filename: `sem-analysis-${projectId}.pdf`,
         results,
@@ -107,7 +115,8 @@ function ExportTab({ projectId, onRestart, results, currency }: ExportTabProps) 
       });
     } catch (error) {
       console.error('PDF export error:', error);
-      alert('Failed to generate PDF. Error: ' + (error instanceof Error ? error.message : 'Unknown error'));
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      setPdfError(`Failed to generate PDF: ${errorMessage}`);
     } finally {
       setPdfLoading(false);
     }
@@ -116,6 +125,26 @@ function ExportTab({ projectId, onRestart, results, currency }: ExportTabProps) 
   return (
     <div className="space-y-6">
       <h3 className="text-lg font-semibold">Export Results</h3>
+      
+      {pdfError && (
+        <div className="p-4 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
+          <div className="flex items-start gap-2">
+            <svg className="w-5 h-5 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <div>
+              <p className="font-medium">Export Failed</p>
+              <p className="mt-1">{pdfError}</p>
+              <button 
+                onClick={() => setPdfError(null)}
+                className="mt-2 text-red-800 underline hover:no-underline"
+              >
+                Dismiss
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-lg">
         {/* ZIP Download */}
