@@ -100,6 +100,7 @@ interface ExportTabProps {
 function ExportTab({ projectId, onRestart }: ExportTabProps) {
   const zipUrl = api.getExportZipUrl(projectId);
   const pdfUrl = api.getExportPdfUrl(projectId);
+  const excelUrl = api.getExportExcelUrl(projectId);
 
   return (
     <div className="space-y-8">
@@ -119,6 +120,23 @@ function ExportTab({ projectId, onRestart }: ExportTabProps) {
             <span className="font-bold text-gray-900 text-lg">Download PDF Report</span>
             <p className="text-sm text-gray-600 mt-2">
               Full analysis report with all sections formatted for sharing
+            </p>
+          </div>
+        </a>
+
+        {/* Excel Download */}
+        <a
+          href={excelUrl}
+          download
+          className="flex items-center gap-6 p-8 border-2 border-green-200 rounded-2xl hover:bg-gradient-to-br hover:from-emerald-50 hover:to-green-50 transition-all duration-300 hover:shadow-xl hover:scale-105 bg-white"
+        >
+          <svg className="w-16 h-16 text-green-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3.375 19.5h17.25m-17.25 0a1.125 1.125 0 01-1.125-1.125M3.375 19.5h7.5c.621 0 1.125-.504 1.125-1.125m-9.75 0V5.625m0 12.75v-1.5c0-.621.504-1.125 1.125-1.125m18.375 2.625V5.625m0 12.75c0 .621-.504 1.125-1.125 1.125m1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125m0 3.75h-7.5A1.125 1.125 0 0112 18.375m9.75-12.75c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125m19.5 0v1.5c0 .621-.504 1.125-1.125 1.125M2.25 5.625v1.5c0 .621.504 1.125 1.125 1.125m0 0h17.25m-17.25 0h7.5c.621 0 1.125.504 1.125 1.125M3.375 8.25c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125m17.25-3.75h-7.5c-.621 0-1.125.504-1.125 1.125m8.625-1.125c.621 0 1.125.504 1.125 1.125v1.5c0 .621-.504 1.125-1.125 1.125m-17.25 0h7.5m-7.5 0c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125M12 10.875v-1.5m0 1.5c0 .621-.504 1.125-1.125 1.125M12 10.875c0 .621.504 1.125 1.125 1.125m-2.25 0c.621 0 1.125.504 1.125 1.125M12 12h7.5m-7.5 0c-.621 0-1.125.504-1.125 1.125M20.625 12c.621 0 1.125.504 1.125 1.125v1.5c0 .621-.504 1.125-1.125 1.125m-17.25 0h7.5M12 14.625v-1.5m0 1.5c0 .621-.504 1.125-1.125 1.125M12 14.625c0 .621.504 1.125 1.125 1.125m-2.25 0c.621 0 1.125.504 1.125 1.125m0 0v1.5c0 .621-.504 1.125-1.125 1.125M2.25 13.125c0-.621.504-1.125 1.125-1.125" />
+          </svg>
+          <div>
+            <span className="font-bold text-gray-900 text-lg">Download Media Plan</span>
+            <p className="text-sm text-gray-600 mt-2">
+              Keywords, ad groups, RSAs &amp; bids (.xlsx)
             </p>
           </div>
         </a>
