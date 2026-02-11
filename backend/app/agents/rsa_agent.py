@@ -1,3 +1,4 @@
+import asyncio
 from typing import Any, Dict, List
 
 from app.agents.base import BaseAgent
@@ -10,7 +11,7 @@ class RSAAgent(BaseAgent):
     """Agent that generates RSA ad copy for each ad group."""
 
     def __init__(self, project_id: str, kimi_client: KimiClient):
-        super().__init__(project_id, kimi_client, use_large_model=True)
+        super().__init__(project_id, kimi_client, use_large_model=False)
         self.agent_name = "RSAAgent"
 
     INCOMPLETE_ENDINGS = {
@@ -58,23 +59,23 @@ class RSAAgent(BaseAgent):
         currency = input_data.get("currency", "USD")
 
         ad_groups = strategy.get("ad_groups", [])
-        all_rsas = []
         total = len(ad_groups)
 
-        for i, ad_group in enumerate(ad_groups):
-            progress = int((i / max(total, 1)) * 90)
-            await self.emit_progress(
-                "running", progress,
-                f"Generating RSAs for: {ad_group.get('name', 'unknown')} ({i + 1}/{total})",
-            )
+        await self.emit_progress(
+            "running", 10,
+            f"Generating RSAs for {total} ad groups in parallel...",
+        )
 
-            rsa = await self._generate_rsa_for_ad_group(
+        tasks = [
+            self._generate_rsa_for_ad_group(
                 ad_group=ad_group,
                 synthesis=synthesis,
                 brand_research=brand_research,
                 currency=currency,
             )
-            all_rsas.append(rsa)
+            for ad_group in ad_groups
+        ]
+        all_rsas = await asyncio.gather(*tasks)
 
         await self.emit_progress("running", 95, "Finalizing RSA generation...")
 
@@ -115,7 +116,7 @@ class RSAAgent(BaseAgent):
 
         response = await self.kimi_client.chat(
             prompt=prompt,
-            use_large_model=True,
+            use_large_model=False,
             system_prompt="You are an expert Google Ads copywriter. Always respond with valid JSON. Never truncate words.",
         )
 
