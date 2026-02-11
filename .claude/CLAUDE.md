@@ -30,7 +30,7 @@ Model selection is controlled by `use_large_model: bool` on each agent:
 
 | Agent | Model | `use_large_model` | Why |
 |-------|-------|-------------------|-----|
-| RSAAgent | K2 | False | Ad copy (parallelized across ad groups) |
+| RSAAgent | K2.5 (non-thinking) | True | Ad copy (parallelized, explicit temp=0.7 skips thinking) |
 | StrategyAgent | K2.5 | True | Strategic planning |
 | SynthesisAgent | K2.5 | True | High-level research synthesis |
 | PersonaAgent | K2 | False | Structured persona extraction |

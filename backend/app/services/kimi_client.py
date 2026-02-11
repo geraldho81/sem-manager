@@ -83,7 +83,7 @@ class KimiClient:
         prompt: str,
         system_prompt: Optional[str] = None,
         use_large_model: bool = False,
-        temperature: float = 0.7,
+        temperature: Optional[float] = None,
         response_format: str = "json",
         max_retries: int = 3,
     ) -> Dict[str, Any]:
@@ -91,8 +91,9 @@ class KimiClient:
         model = settings.KIMI_MODEL_THINKING if use_large_model else settings.KIMI_MODEL_STANDARD
 
         # kimi-k2.5 thinking model only allows temperature=1
-        if use_large_model:
-            temperature = 1.0
+        # But if caller explicitly passes a temperature, respect it (e.g. non-thinking K2.5 use)
+        if temperature is None:
+            temperature = 1.0 if use_large_model else 0.7
 
         messages: List[Dict[str, str]] = []
         if system_prompt:

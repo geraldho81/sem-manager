@@ -11,7 +11,7 @@ class RSAAgent(BaseAgent):
     """Agent that generates RSA ad copy for each ad group."""
 
     def __init__(self, project_id: str, kimi_client: KimiClient):
-        super().__init__(project_id, kimi_client, use_large_model=False)
+        super().__init__(project_id, kimi_client, use_large_model=True)
         self.agent_name = "RSAAgent"
 
     INCOMPLETE_ENDINGS = {
@@ -116,7 +116,8 @@ class RSAAgent(BaseAgent):
 
         response = await self.kimi_client.chat(
             prompt=prompt,
-            use_large_model=False,
+            use_large_model=True,
+            temperature=0.7,
             system_prompt="You are an expert Google Ads copywriter. Always respond with valid JSON. Never truncate words.",
         )
 
