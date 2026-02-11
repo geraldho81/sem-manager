@@ -20,21 +20,21 @@ export default function Home() {
   } = usePipeline();
 
   return (
-    <main className="min-h-screen animated-gradient-bg">
+    <main className="min-h-screen bg-white">
       <div className="max-w-6xl mx-auto px-4 py-8">
-        {/* Premium Header with Logo */}
+        {/* Header with Logo */}
         <div className="text-center mb-12 fade-in">
           <div className="flex items-center justify-center gap-4 mb-6">
-            <img 
-              src="/Logo.webp" 
-              alt="MediaPlus Digital" 
-              className="h-16 md:h-20 object-contain drop-shadow-2xl"
+            <img
+              src="/Logo.webp"
+              alt="MediaPlus Digital"
+              className="h-16 md:h-20 object-contain"
             />
           </div>
-          <h1 className="text-4xl md:text-5xl font-bold text-white mb-3 drop-shadow-lg">
+          <h1 className="font-cinema text-4xl md:text-5xl font-semibold text-gray-900 mb-3 tracking-wide">
             SEM Manager
           </h1>
-          <p className="text-white/90 text-lg md:text-xl max-w-2xl mx-auto font-light">
+          <p className="text-gray-500 text-lg md:text-xl max-w-2xl mx-auto font-light tracking-wide">
             AI-powered search engine marketing analysis and ad generation
           </p>
         </div>
