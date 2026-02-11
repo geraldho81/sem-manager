@@ -84,14 +84,15 @@ class KimiClient:
         system_prompt: Optional[str] = None,
         use_large_model: bool = False,
         temperature: Optional[float] = None,
+        top_p: Optional[float] = None,
+        extra_body: Optional[Dict[str, Any]] = None,
         response_format: str = "json",
         max_retries: int = 3,
     ) -> Dict[str, Any]:
         """Send a chat completion request to Kimi API."""
         model = settings.KIMI_MODEL_THINKING if use_large_model else settings.KIMI_MODEL_STANDARD
 
-        # kimi-k2.5 thinking model only allows temperature=1
-        # But if caller explicitly passes a temperature, respect it (e.g. non-thinking K2.5 use)
+        # kimi-k2.5 thinking model requires temperature=1 unless thinking is disabled
         if temperature is None:
             temperature = 1.0 if use_large_model else 0.7
 
@@ -103,12 +104,19 @@ class KimiClient:
         last_error = None
         for attempt in range(max_retries):
             try:
-                response = await self.client.chat.completions.create(
-                    model=model,
-                    messages=messages,
-                    temperature=temperature,
-                    response_format={"type": "json_object"} if response_format == "json" else None,
-                )
+                kwargs: Dict[str, Any] = {
+                    "model": model,
+                    "messages": messages,
+                    "temperature": temperature,
+                }
+                if response_format == "json":
+                    kwargs["response_format"] = {"type": "json_object"}
+                if top_p is not None:
+                    kwargs["top_p"] = top_p
+                if extra_body is not None:
+                    kwargs["extra_body"] = extra_body
+
+                response = await self.client.chat.completions.create(**kwargs)
 
                 content = response.choices[0].message.content
 

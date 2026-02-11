@@ -117,7 +117,9 @@ class RSAAgent(BaseAgent):
         response = await self.kimi_client.chat(
             prompt=prompt,
             use_large_model=True,
-            temperature=0.7,
+            temperature=0.6,
+            top_p=0.95,
+            extra_body={"thinking": {"type": "disabled"}},
             system_prompt="You are an expert Google Ads copywriter. Always respond with valid JSON. Never truncate words.",
         )
 
