@@ -74,20 +74,20 @@ export function SetupStep({ onStart, error }: SetupStepProps) {
   return (
     <form onSubmit={handleSubmit} className="max-w-2xl mx-auto space-y-6">
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">Project Name</label>
+        <label className="block text-sm font-semibold text-gray-700 mb-2">Project Name</label>
         <input
           type="text"
           value={projectName}
           onChange={(e) => setProjectName(e.target.value)}
           placeholder="My SEM Campaign"
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          className="w-full px-4 py-3 border-2 border-purple-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 bg-white"
           required
         />
       </div>
 
       {!isCloud && (
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-sm font-semibold text-gray-700 mb-2">
             Output Folder
           </label>
           <div className="flex gap-2">
@@ -96,7 +96,7 @@ export function SetupStep({ onStart, error }: SetupStepProps) {
               value={projectFolder}
               onChange={(e) => setProjectFolder(e.target.value)}
               placeholder="/Users/you/Desktop/sem-output"
-              className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="flex-1 px-4 py-3 border-2 border-purple-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 bg-white"
               required
             />
             <button
@@ -113,23 +113,23 @@ export function SetupStep({ onStart, error }: SetupStepProps) {
                   setBrowsing(false);
                 }
               }}
-              className="px-4 py-2 bg-gray-100 text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-200 whitespace-nowrap disabled:opacity-50"
+              className="px-6 py-3 bg-gradient-to-r from-gray-100 to-gray-200 text-gray-700 border-2 border-gray-300 rounded-xl hover:from-gray-200 hover:to-gray-300 font-medium whitespace-nowrap disabled:opacity-50 transition-all duration-200"
             >
               {browsing ? 'Selecting...' : 'Browse...'}
             </button>
           </div>
-          <p className="mt-1 text-sm text-gray-500">
+          <p className="mt-2 text-sm text-gray-600">
             Where to save all agent outputs (research, ads, Excel)
           </p>
         </div>
       )}
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">Target Market</label>
+        <label className="block text-sm font-semibold text-gray-700 mb-2">Target Market</label>
         <select
           value={market}
           onChange={(e) => setMarket(e.target.value as MarketKey)}
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          className="w-full px-4 py-3 border-2 border-purple-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 bg-white"
         >
           {(Object.entries(MARKETS) as [MarketKey, typeof MARKETS[MarketKey]][]).map(([key, m]) => (
             <option key={key} value={key}>
@@ -137,14 +137,14 @@ export function SetupStep({ onStart, error }: SetupStepProps) {
             </option>
           ))}
         </select>
-        <p className="mt-1 text-sm text-gray-500">
+        <p className="mt-2 text-sm text-gray-600">
           CPC data in {selectedMarket.currency} ({selectedMarket.currency_symbol})
         </p>
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">Landing Page URLs</label>
-        <div className="space-y-2">
+        <label className="block text-sm font-semibold text-gray-700 mb-2">Landing Page URLs</label>
+        <div className="space-y-3">
           {urls.map((url, i) => (
             <div key={i} className="flex gap-2">
               <input
@@ -152,14 +152,14 @@ export function SetupStep({ onStart, error }: SetupStepProps) {
                 value={url}
                 onChange={(e) => updateUrl(i, e.target.value)}
                 placeholder="https://example.com"
-                className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="flex-1 px-4 py-3 border-2 border-purple-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 bg-white"
                 required={i === 0}
               />
               {urls.length > 1 && (
                 <button
                   type="button"
                   onClick={() => removeUrl(i)}
-                  className="px-3 py-2 text-red-600 hover:bg-red-50 rounded-lg"
+                  className="px-4 py-3 text-red-600 hover:bg-red-50 rounded-xl font-medium transition-all duration-200"
                 >
                   Remove
                 </button>
@@ -170,17 +170,17 @@ export function SetupStep({ onStart, error }: SetupStepProps) {
         <button
           type="button"
           onClick={addUrl}
-          className="mt-2 text-sm text-blue-600 hover:text-blue-800"
+          className="mt-3 text-sm font-semibold text-purple-600 hover:text-purple-800 transition-colors duration-200"
         >
           + Add another URL
         </button>
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
-          Competitor URLs <span className="text-gray-400">(optional)</span>
+        <label className="block text-sm font-semibold text-gray-700 mb-2">
+          Competitor URLs <span className="text-gray-400 font-normal">(optional)</span>
         </label>
-        <div className="space-y-2">
+        <div className="space-y-3">
           {competitorUrls.map((url, i) => (
             <div key={i} className="flex gap-2">
               <input
@@ -188,13 +188,13 @@ export function SetupStep({ onStart, error }: SetupStepProps) {
                 value={url}
                 onChange={(e) => updateCompetitor(i, e.target.value)}
                 placeholder="https://competitor.com"
-                className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="flex-1 px-4 py-3 border-2 border-purple-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 bg-white"
               />
               {competitorUrls.length > 1 && (
                 <button
                   type="button"
                   onClick={() => removeCompetitor(i)}
-                  className="px-3 py-2 text-red-600 hover:bg-red-50 rounded-lg"
+                  className="px-4 py-3 text-red-600 hover:bg-red-50 rounded-xl font-medium transition-all duration-200"
                 >
                   Remove
                 </button>
@@ -205,17 +205,17 @@ export function SetupStep({ onStart, error }: SetupStepProps) {
         <button
           type="button"
           onClick={addCompetitor}
-          className="mt-2 text-sm text-blue-600 hover:text-blue-800"
+          className="mt-3 text-sm font-semibold text-purple-600 hover:text-purple-800 transition-colors duration-200"
         >
           + Add competitor
         </button>
-        <p className="mt-1 text-sm text-gray-500">
+        <p className="mt-2 text-sm text-gray-600">
           Leave empty to auto-discover competitors
         </p>
       </div>
 
       {error && (
-        <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
+        <div className="p-4 bg-red-50 border-2 border-red-200 rounded-xl text-red-700 text-sm font-medium">
           {error}
         </div>
       )}
@@ -223,7 +223,7 @@ export function SetupStep({ onStart, error }: SetupStepProps) {
       <button
         type="submit"
         disabled={loading || !projectName.trim() || !urls[0]?.trim() || (!isCloud && !projectFolder.trim())}
-        className="w-full py-3 px-4 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+        className="w-full py-4 px-6 bg-gradient-to-r from-blue-500 to-purple-600 text-white font-bold rounded-xl hover:from-blue-600 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02]"
       >
         {loading ? 'Starting...' : 'Start Analysis'}
       </button>

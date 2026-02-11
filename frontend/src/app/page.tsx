@@ -20,37 +20,49 @@ export default function Home() {
   } = usePipeline();
 
   return (
-    <main className="min-h-screen bg-gray-50">
+    <main className="min-h-screen animated-gradient-bg">
       <div className="max-w-6xl mx-auto px-4 py-8">
-        {/* Header */}
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">SEM Manager</h1>
-          <p className="text-gray-500 mt-1">
+        {/* Premium Header with Logo */}
+        <div className="text-center mb-12 fade-in">
+          <div className="flex items-center justify-center gap-4 mb-6">
+            <img 
+              src="/Logo.webp" 
+              alt="MediaPlus Digital" 
+              className="h-16 md:h-20 object-contain drop-shadow-2xl"
+            />
+          </div>
+          <h1 className="text-4xl md:text-5xl font-bold text-white mb-3 drop-shadow-lg">
+            SEM Manager
+          </h1>
+          <p className="text-white/90 text-lg md:text-xl max-w-2xl mx-auto font-light">
             AI-powered search engine marketing analysis and ad generation
           </p>
         </div>
 
-        <StepIndicator current={step} />
+        {/* Glass Card Container */}
+        <div className="glass-card rounded-2xl p-8 fade-in" style={{ animationDelay: '0.1s' }}>
+          <StepIndicator current={step} />
 
-        {step === 'setup' && (
-          <SetupStep onStart={startPipeline} error={error} />
-        )}
+          {step === 'setup' && (
+            <SetupStep onStart={startPipeline} error={error} />
+          )}
 
-        {step === 'running' && (
-          <RunningStep
-            agentUpdates={agentUpdates}
-            connected={connected}
-            onCancel={cancelPipeline}
-          />
-        )}
+          {step === 'running' && (
+            <RunningStep
+              agentUpdates={agentUpdates}
+              connected={connected}
+              onCancel={cancelPipeline}
+            />
+          )}
 
-        {step === 'results' && results && projectId && (
-          <ResultsStep
-            results={results}
-            projectId={projectId}
-            onRestart={restart}
-          />
-        )}
+          {step === 'results' && results && projectId && (
+            <ResultsStep
+              results={results}
+              projectId={projectId}
+              onRestart={restart}
+            />
+          )}
+        </div>
       </div>
     </main>
   );
