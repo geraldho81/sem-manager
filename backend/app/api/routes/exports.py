@@ -5,6 +5,7 @@ import io
 import zipfile
 
 from app.api.routes.projects import projects_db
+from app.config import MARKETS
 
 router = APIRouter()
 
@@ -71,4 +72,55 @@ async def export_zip(project_id: str):
         buf,
         media_type="application/zip",
         headers={"Content-Disposition": f'attachment; filename="{safe_name}_export.zip"'},
+    )
+
+
+@router.get("/{project_id}/pdf")
+async def export_pdf(project_id: str) -> FileResponse:
+    """Download SEM Analysis Report as PDF."""
+    project_path = _get_project_folder(project_id)
+
+    # Check for existing PDF on disk
+    pdf_files = list(project_path.glob("sem_report_*.pdf"))
+    if pdf_files:
+        pdf_file = max(pdf_files, key=lambda f: f.stat().st_mtime)
+        return FileResponse(
+            path=pdf_file,
+            filename=pdf_file.name,
+            media_type="application/pdf",
+        )
+
+    # Generate on-demand from pipeline outputs
+    from app.api.routes.pipeline import pipeline_status_db
+
+    if project_id not in pipeline_status_db:
+        raise HTTPException(status_code=404, detail="Pipeline not found. Run the pipeline first.")
+
+    outputs = pipeline_status_db[project_id].outputs
+    if not outputs:
+        raise HTTPException(status_code=404, detail="No pipeline results. Run the pipeline first.")
+
+    project = projects_db[project_id]
+    config = project.get("config", {})
+    market = config.get("market", "us")
+    market_config = MARKETS.get(market, MARKETS["us"])
+    currency = market_config["currency"]
+    landing_page_urls = config.get("landing_page_urls", [])
+
+    from app.services.pdf_exporter import PDFExporter
+
+    exporter = PDFExporter()
+    pdf_path = exporter.export(
+        results=outputs,
+        project_name=project.get("name", "SEM Report"),
+        market=market,
+        currency=currency,
+        landing_page_urls=landing_page_urls,
+        output_folder=str(project_path),
+    )
+
+    return FileResponse(
+        path=pdf_path,
+        filename=Path(pdf_path).name,
+        media_type="application/pdf",
     )

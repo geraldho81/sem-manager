@@ -99,12 +99,30 @@ interface ExportTabProps {
 
 function ExportTab({ projectId, onRestart }: ExportTabProps) {
   const zipUrl = api.getExportZipUrl(projectId);
+  const pdfUrl = api.getExportPdfUrl(projectId);
 
   return (
     <div className="space-y-8">
       <h3 className="text-2xl font-bold text-gray-800">Export Results</h3>
 
-      <div className="max-w-md">
+      <div className="max-w-md space-y-4">
+        {/* PDF Download */}
+        <a
+          href={pdfUrl}
+          download
+          className="flex items-center gap-6 p-8 border-2 border-red-200 rounded-2xl hover:bg-gradient-to-br hover:from-orange-50 hover:to-red-50 transition-all duration-300 hover:shadow-xl hover:scale-105 bg-white"
+        >
+          <svg className="w-16 h-16 text-red-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
+          </svg>
+          <div>
+            <span className="font-bold text-gray-900 text-lg">Download PDF Report</span>
+            <p className="text-sm text-gray-600 mt-2">
+              Full analysis report with all sections formatted for sharing
+            </p>
+          </div>
+        </a>
+
         {/* ZIP Download */}
         <a
           href={zipUrl}

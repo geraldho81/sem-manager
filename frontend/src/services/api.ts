@@ -52,4 +52,5 @@ export const api = {
   // Exports
   getExportExcelUrl: (projectId: string) => `${BASE}/exports/${projectId}/excel`,
   getExportZipUrl: (projectId: string) => `${BASE}/exports/${projectId}/zip`,
+  getExportPdfUrl: (projectId: string) => `${BASE}/exports/${projectId}/pdf`,
 };
